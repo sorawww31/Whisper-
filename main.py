@@ -1,4 +1,5 @@
 import argparse
+import logging
 import os
 import time
 from datetime import timedelta
@@ -11,6 +12,8 @@ from moviepy import VideoFileClip
 from pyannote.audio import Audio, Pipeline
 from pyannote.core import Segment
 from tqdm import tqdm
+
+logging.getLogger().setLevel(logging.WARNING)
 
 
 def convert_mp4_to_wav(input_file="./ookawa.mp4", output_file="./ookawa_edited.wav"):
@@ -91,17 +94,14 @@ def model_load(args, model_size="large-v2", device="cuda", compute_type="int8_fl
 
 def segments_transform(segments):
     segments_transformed = []
-
-    segment_0, _, speaker_0 = next(segments)
+    segments_list = sorted(list(segments), key=lambda x: x[0].end)
+    segment_0, _, speaker_0 = segments_list[0]
     previous_speaker = speaker_0
     start = segment_0.start
     end = segment_0.end
-
-    for segment, _, speaker in segments:
-        # Convert to seconds and format
+    for segment, _, speaker in segments_list:
         if speaker == previous_speaker:
             end = segment.end
-            previous_speaker = speaker
         else:
             new_segment = Segment(start, end)
             if new_segment.duration >= 0.2:
@@ -109,6 +109,7 @@ def segments_transform(segments):
             previous_speaker = speaker
             start = segment.start
             end = segment.end
+
     return segments_transformed
 
 
@@ -156,7 +157,7 @@ def main(args):
     segments = segments_transform(segments)
     merged_segments = []
     whisper_start = time.perf_counter()
-    for segment, speaker in segments:
+    for segment, speaker in tqdm(segments, desc="Transcribing segments"):
         waveform, sample_rate = audio.crop(wav_file, segment)
 
         # model.transcribe returns a tuple: (segments, info)

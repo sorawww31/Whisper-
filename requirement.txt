@@ -1,3 +1,0 @@
-pyannote.audio
-faster-whisper
-moviepy
