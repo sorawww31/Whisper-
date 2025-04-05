@@ -7,7 +7,7 @@ import torch
 import whisper
 from dotenv import load_dotenv
 from faster_whisper import WhisperModel
-from moviepy.editor import VideoFileClip
+from moviepy import VideoFileClip
 from pyannote.audio import Audio, Pipeline
 from pyannote.core import Segment
 from tqdm import tqdm
