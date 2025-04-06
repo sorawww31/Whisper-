@@ -35,7 +35,7 @@ python main.py \
   --model_size deepdml/faster-whisper-large-v3-turbo-ct2 \
   --wav_file /data/test.wav \
   --num_speakers 2 \
-  --output_file fast-v3-turbo-ct2.txt \
+  --output_file outpus/fast-v3-turbo-ct2.txt \
   --device cuda
 ```
 
